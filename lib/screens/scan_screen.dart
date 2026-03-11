@@ -14,21 +14,17 @@ class _ScanScreenState extends State<ScanScreen> {
   final ScanViewModel viewModel = ScanViewModel();
   final MobileScannerController controller = MobileScannerController();
 
-  bool _isHandlingScan = false;
+  bool _busy = false;
 
   Future<void> _handleDetection(BarcodeCapture capture) async {
-    if (_isHandlingScan) return;
+    if (_busy) return;
 
-    final Barcode? barcode =
-        capture.barcodes.isNotEmpty ? capture.barcodes.first : null;
+    final barcode = capture.barcodes.isNotEmpty ? capture.barcodes.first : null;
+    final code = barcode?.rawValue;
 
-    final String? code = barcode?.rawValue;
+    if (code == null || code.trim().isEmpty) return;
 
-    if (code == null || code.trim().isEmpty) {
-      return;
-    }
-
-    _isHandlingScan = true;
+    _busy = true;
 
     await viewModel.searchProduct(code);
 
@@ -46,26 +42,21 @@ class _ScanScreenState extends State<ScanScreen> {
       ),
     );
 
-    await Future.delayed(const Duration(milliseconds: 800));
-    _isHandlingScan = false;
+    await Future.delayed(const Duration(milliseconds: 1000));
+    _busy = false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MobileScanner(
+      controller: controller,
+      onDetect: _handleDetection,
+    );
   }
 
   @override
   void dispose() {
     controller.dispose();
     super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Scanner de code-barres'),
-      ),
-      body: MobileScanner(
-        controller: controller,
-        onDetect: _handleDetection,
-      ),
-    );
   }
 }
