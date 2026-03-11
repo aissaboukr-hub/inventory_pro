@@ -13,7 +13,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-    sqflite: ^2.0.0+4
+
+  sqflite: ^2.0.0+4
   mobile_scanner: ^0.3.0
   excel: ^2.0.4
   path_provider: ^2.0.7
