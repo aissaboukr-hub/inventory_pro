@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'dart:isolate';
+import 'dart:typed_data';
 
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
@@ -38,7 +38,7 @@ class ImportService {
 
     final List<Product> products = await compute(_parseExcelInIsolate, bytes);
 
-    await _dbHelper.insertProductsBatch(products);
+    await DatabaseHelper.insertProductsBatch(products);
 
     return ImportResult(
       importedCount: products.length,
@@ -61,7 +61,7 @@ class ImportService {
           p.barcode.trim().isNotEmpty;
     }).toList();
 
-    await _dbHelper.insertProductsBatch(products);
+    await DatabaseHelper.insertProductsBatch(products);
 
     return ImportResult(
       importedCount: products.length,
@@ -80,28 +80,13 @@ class ImportService {
       final headerRow = sheet.rows.first;
       final headerMap = _detectColumns(headerRow);
 
-      if (!headerMap.containsKey('code') &&
-          !headerMap.containsKey('designation') &&
-          !headerMap.containsKey('barcode')) {
-        continue;
-      }
-
       for (int i = 1; i < sheet.rows.length; i++) {
         final row = sheet.rows[i];
         if (row.isEmpty) continue;
 
-        final code = _cellValue(
-          row,
-          headerMap['code'],
-        );
-        final designation = _cellValue(
-          row,
-          headerMap['designation'],
-        );
-        final barcode = _cellValue(
-          row,
-          headerMap['barcode'],
-        );
+        final code = _cellValue(row, headerMap['code']);
+        final designation = _cellValue(row, headerMap['designation']);
+        final barcode = _cellValue(row, headerMap['barcode']);
 
         if (code.isEmpty && designation.isEmpty && barcode.isEmpty) {
           continue;
