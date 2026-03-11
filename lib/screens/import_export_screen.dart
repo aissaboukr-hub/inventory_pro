@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../services/import_service.dart';
 import '../database/database_helper.dart';
-import '../utils/excel_utils.dart';
+import '../services/import_service.dart';
+import '../utils/excel_utils.dart' as excel_utils;
 
 class ImportExportScreen extends StatefulWidget {
   const ImportExportScreen({super.key});
@@ -76,7 +76,7 @@ class _ImportExportScreenState extends State<ImportExportScreen> {
     setState(() => _loading = true);
 
     try {
-      final file = await exportToExcel();
+      final file = await excel_utils.exportToExcel();
 
       if (!mounted) return;
 

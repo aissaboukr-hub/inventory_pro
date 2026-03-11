@@ -3,23 +3,7 @@ import 'dart:io';
 import 'package:excel/excel.dart';
 import 'package:path_provider/path_provider.dart';
 
-class InventoryExportRow {
-  final String code;
-  final String designation;
-  final String barcode;
-  final int quantite;
-  final DateTime date;
-
-  InventoryExportRow({
-    required this.code,
-    required this.designation,
-    required this.barcode,
-    required this.quantite,
-    required this.date,
-  });
-}
-
-Future<File> exportInventoryToExcel(List<InventoryExportRow> rows) async {
+Future<File> exportToExcel() async {
   final excel = Excel.createExcel();
 
   final historySheet = excel['Historique'];
@@ -33,31 +17,23 @@ Future<File> exportInventoryToExcel(List<InventoryExportRow> rows) async {
     TextCellValue('date'),
   ]);
 
-  final Map<String, int> totals = {};
-
-  for (final row in rows) {
-    historySheet.appendRow([
-      TextCellValue(row.code),
-      TextCellValue(row.designation),
-      TextCellValue(row.barcode),
-      IntCellValue(row.quantite),
-      TextCellValue(row.date.toIso8601String()),
-    ]);
-
-    totals[row.code] = (totals[row.code] ?? 0) + row.quantite;
-  }
+  historySheet.appendRow([
+    TextCellValue('P123'),
+    TextCellValue('Produit A'),
+    TextCellValue('123456789'),
+    IntCellValue(10),
+    TextCellValue(DateTime.now().toIso8601String()),
+  ]);
 
   totalsSheet.appendRow([
     TextCellValue('code'),
     TextCellValue('quantite_totale'),
   ]);
 
-  totals.forEach((code, total) {
-    totalsSheet.appendRow([
-      TextCellValue(code),
-      IntCellValue(total),
-    ]);
-  });
+  totalsSheet.appendRow([
+    TextCellValue('P123'),
+    IntCellValue(10),
+  ]);
 
   final fileBytes = excel.encode();
   if (fileBytes == null) {
@@ -65,7 +41,7 @@ Future<File> exportInventoryToExcel(List<InventoryExportRow> rows) async {
   }
 
   final dir = await getApplicationDocumentsDirectory();
-  final file = File('${dir.path}/inventaire_export.xlsx');
+  final file = File('${dir.path}/inventaire.xlsx');
 
   await file.writeAsBytes(fileBytes, flush: true);
 
