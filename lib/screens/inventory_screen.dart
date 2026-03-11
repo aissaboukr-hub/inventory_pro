@@ -47,7 +47,9 @@ class InventoryScreen extends StatelessWidget {
             final item = items[index];
             return ListTile(
               leading: const Icon(Icons.inventory_2),
-              title: Text(item.designation.isEmpty ? 'Sans désignation' : item.designation),
+              title: Text(
+                item.designation.isEmpty ? 'Sans désignation' : item.designation,
+              ),
               subtitle: Text(
                 'Code: ${item.code} | Barcode: ${item.barcode} | Qté: ${item.quantity}',
               ),
